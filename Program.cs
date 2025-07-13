@@ -91,6 +91,21 @@ builder.Services.AddRateLimiter(options =>
 });
 
 
+builder.Services.AddCors(options =>
+{
+    // Get allowed origins from configuration
+    var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+                        ?? new[] { "http://localhost:4200" }; // fallback
+
+    options.AddPolicy("AllowAngularApp", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -109,6 +124,8 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
+app.UseCors("AllowAngularApp");
 
 app.UseRateLimiter();
 app.UseAuthentication();

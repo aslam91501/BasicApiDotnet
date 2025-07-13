@@ -16,7 +16,7 @@ namespace BasicApi.Auth.Data
         public async Task<User?> GetUser(int id)
         {
             var query = @"
-                SELECT * FROM ""USERS"" 
+                SELECT * FROM ""Users"" 
                 WHERE ""Id"" = @Id
             ";
 
@@ -26,8 +26,8 @@ namespace BasicApi.Auth.Data
         public async Task<User?> GetUserByEmail(string email)
         {
             var query = @"
-                SELECT * FROM ""USERS"" 
-                WHERE ""Email"" = @Id
+                SELECT * FROM ""Users"" 
+                WHERE ""Email"" = @Email
             ";
 
             return await _connection.QuerySingleAsync<User>(query, new { Email = email });

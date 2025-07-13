@@ -40,11 +40,37 @@ namespace BasicApi.Auth.Controller
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
 
-                return Ok(new { message = "Login successful" });
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                return Unauthorized(e.Message);
+            }
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegistrationRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid format");
+            }
+
+            try
+            {
+                var response = await _authService.Register(request);
+
+                if (!response)
+                {
+                    return StatusCode(500, "Could not create account.");
+
+                }
+
+                return Ok(response);
             }
             catch
             {
-                return Unauthorized("Invalid credentials");
+                return StatusCode(500, "Could not create account.");
             }
         }
 
@@ -66,6 +92,23 @@ namespace BasicApi.Auth.Controller
                 message = "Access denied. You don't have permission to access this resource.",
                 error = "Forbidden"
             });
+        }
+
+
+        [HttpGet("status")]
+        public IActionResult GetAuthStatus()
+        {
+            Console.WriteLine(User.Identity?.IsAuthenticated);
+            if (User.Identity?.IsAuthenticated is not null && User.Identity.IsAuthenticated)
+            {
+                return Ok(new
+                {
+                    isAuthenticated = true,
+                    userId = User.FindFirst("UserId")?.Value,
+                });
+            }
+
+            return Ok(new { isAuthenticated = false });
         }
     }
 }

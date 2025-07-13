@@ -21,7 +21,7 @@ namespace BasicApi.Auth.Service
 
             var passwordValid = _passwordService.VerifyPassword(request.Password, user.PasswordHash);
 
-            if (!passwordValid) throw new Exception("Authentication failed. User does not exist.");
+            if (!passwordValid) throw new Exception("Authentication failed. Invalid Password");
 
             return new LoginResponse(true, user.Id);
         }
